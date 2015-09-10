@@ -32,3 +32,12 @@ select s.id
 from dbo.sellers s
 where s.partner in(47010)
 ;
+
+sa_make_object 'view', 'pricelist', bp;
+
+alter view bp.pricelist
+as
+select pl.id
+from dbo.pricelist pl
+where pl.id = 10007
+;

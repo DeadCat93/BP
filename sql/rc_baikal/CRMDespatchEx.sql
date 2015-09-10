@@ -35,8 +35,8 @@ begin
     select @ddate as ddate,
         rg.id,
         rg.subid,
-        isnull(b.partner, abs(b.id)) as CompanyId,
-        abs(b.id) as AddressId,
+        coalesce(p.code, s.code, if b.id >0 then b.id else abs(b.id +1) endif) as CompanyId,
+        CompanyId as AddressId,
         null as AddressRegionType,
         null as SaleChannel,
         null as CRMOrderNumber,
@@ -47,7 +47,18 @@ begin
         dateadd(day, isnull(pay.plong, 0), r.ddate) as PayDate,
         wh.WareHouseId,
         w.WareId,
-        rg.price,
+        if rg.currency = 0 then
+            rg.price
+        else
+            isnull(
+                (
+                    select ppl.price
+                    from dbo.pricelist_prices ppl join bp.pricelist pl on ppl.list = pl.id
+                    where ppl.ddate = r.ddate
+                        and ppl.goods  = rg.goods
+                ), 0
+            )
+        endif as price,
         cast(rg.vol as integer) as Quantity,
         null as CRMClientId,
         coalesce(p.name, s.name, b.name) as CompanyName,
