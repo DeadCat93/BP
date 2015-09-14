@@ -1,7 +1,7 @@
 create or replace procedure bp.xDataLinkExchange(
     @ddate datetime default today() -1,
     @syncCRMWare integer default 0,
-    @syncCRMWhBalanceEx integer default 0,
+    @syncCRMWhBalanceEx integer default 1,
     @syncCRMDespatchEx integer default 1
 )
 begin

@@ -162,7 +162,7 @@ begin
                         (
                             select xmlagg(
                                     xmlelement('r',
-                                        xmlelement('f'),
+                                        xmlelement('f', CRMClientId),
                                         xmlelement('f', CompanyId),
                                         xmlelement('f', CompanyName),
                                         xmlelement('f', AddressId),
@@ -171,13 +171,12 @@ begin
                                     )
                                 )
                             from (
-                                select distinct
-                                    CRMClientId,
+                                select CRMClientId,
                                     CompanyId,
-                                    CompanyName,
-                                    AddressId,
-                                    AddressName,
-                                    Location
+                                    min(CompanyName) as CompanyName,
+                                    min(AddressId) as AddressId,
+                                    min(AddressName) as AddressName,
+                                    min(Location) as Location
                                 from openxml(xmlelement('root', @data), '/root/CRMDespatchEx')
                                     with(
                                         CRMClientId STRING '@CRMClientId',
@@ -186,8 +185,9 @@ begin
                                         AddressId STRING '@AddressId',
                                         AddressName STRING '@AddressName',
                                         Location STRING '@Location'
-                                    )
-                                where CompanyId is not null
+                                    ) as tt
+                                where t.CompanyId is not null
+                                group by CRMClientId, CompanyId
                             ) as t
 
                         )
