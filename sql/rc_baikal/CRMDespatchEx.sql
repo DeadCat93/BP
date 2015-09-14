@@ -35,7 +35,7 @@ begin
     select @ddate as ddate,
         rg.id,
         rg.subid,
-        coalesce(p.code, s.code, if b.id >0 then b.id else abs(b.id +1) endif) as CompanyId,
+        coalesce(bs.id, if b.id >0 then b.id else abs(b.id +1) endif) as CompanyId,
         CompanyId as AddressId,
         null as AddressRegionType,
         null as SaleChannel,
@@ -60,14 +60,15 @@ begin
             )
         endif as price,
         cast(rg.vol as integer) as Quantity,
-        null as CRMClientId,
+        coalesce(s.code, b.info) as CRMClientId,
         coalesce(p.name, s.name, b.name) as CompanyName,
         coalesce(s.name, b.name) as AddressName,
-        coalesce(s.loadfrom, b.loadto) as Location
+        coalesce(bs.loadto, s.loadfrom, b.loadto) as Location
     from dbo.recept r join dbo.recgoods rg on r.id = rg.id
         join dbo.payspt pay on pay.id = rg.pays
         join dbo.buyers b on b.id = r.client
             left outer join dbo.storages s on s.id = -r.client
+            left outer join dbo.buyers bs on bs.info = s.code
             left outer join dbo.partners p on p.id = b.partner
         join bp.CRMWareHouse wh on wh.id = r.storage
         join bp.CRMWare w on w.id = rg.goods
