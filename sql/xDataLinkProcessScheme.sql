@@ -186,8 +186,8 @@ begin
                                         AddressName STRING '@AddressName',
                                         Location STRING '@Location'
                                     ) as tt
-                                where t.CompanyId is not null
-                                group by CRMClientId, CompanyId
+                                where tt.CompanyId is not null
+                                group by tt.CRMClientId, tt.CompanyId
                             ) as t
 
                         )
