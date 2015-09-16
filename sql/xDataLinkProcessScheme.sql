@@ -162,7 +162,7 @@ begin
                         (
                             select xmlagg(
                                     xmlelement('r',
-                                        xmlelement('f', CRMClientId),
+                                        xmlelement('f'),
                                         xmlelement('f', CompanyId),
                                         xmlelement('f', CompanyName),
                                         xmlelement('f', AddressId),

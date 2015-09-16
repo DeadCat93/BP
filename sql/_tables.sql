@@ -27,7 +27,7 @@ create table bp.CRMWare(
     UnitId STRING not null,
     UnitName STRING,
 
-    Quantity int,
+    Quantity decimal(18,4),
 
     unique(WareId, UnitId),
 

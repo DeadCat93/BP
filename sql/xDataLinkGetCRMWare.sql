@@ -21,7 +21,7 @@ begin
                 WareName STRING 'WareName',
                 UnitId STRING 'UnitId',
                 UnitName STRING 'UnitName',
-                Quantity integer 'Quantity'
+                Quantity decimal(18,4) 'Quantity'
             )
     ) as t on t.WareId = bp.CRMWare.WareId
         and t.UnitId = bp.CRMWare.UnitId
