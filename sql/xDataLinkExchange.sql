@@ -1,8 +1,9 @@
 create or replace procedure bp.xDataLinkExchange(
     @ddate datetime default today() -1,
-    @syncCRMWare integer default 0,
+    @syncCRMWare integer default 1,
     @syncCRMWhBalanceEx integer default 1,
-    @syncCRMDespatchEx integer default 1
+    @syncCRMDespatchEx integer default 1,
+    @syncCRMWarePrice integer default 1
 )
 begin
 
@@ -22,6 +23,10 @@ begin
     -- syncCRMDespatchEx
     if @syncCRMDespatchEx = 1 then
         call bp.xDataLinkSetCRMDespatchEx(@ddate);
+    end if;
+
+    if @syncCRMWarePrice =  1 then
+        call bp.xDataLinkSetCRMWarePrice(@ddate);
     end if;
 
     return;

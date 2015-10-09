@@ -195,6 +195,69 @@ begin
                 )
             )
 
+    when 'CRMWarePrice' then
+
+    set @result = xmlelement('data',
+            xmlelement('s',
+                xmlelement('d',
+                    xmlattributes('CRMWareRangePrice' as "name"),
+                    bp.xDataLinkSchemeField('PriceDate', 'Date'),
+                    bp.xDataLinkSchemeField('PriceTypeId', 'String'),
+                    bp.xDataLinkSchemeField('WareId', 'String'),
+                    bp.xDataLinkSchemeField('UnitId', 'String'),
+                    bp.xDataLinkSchemeField('Price', 'Currency')
+                ),
+                xmlelement('d',
+                    xmlattributes('CRMWareRangeLink' as "name"),
+                    bp.xDataLinkSchemeField('PriceTypeId', 'String'),
+                    bp.xDataLinkSchemeField('CompanyId', 'String'),
+                    bp.xDataLinkSchemeField('AddressId', 'String')
+                )
+            ),
+            xmlelement('o',
+                xmlelement('d',
+                    xmlattributes('CRMWareRangePrice' as "name"),
+                    (
+                        select xmlagg(
+                                xmlelement('r',
+                                    xmlelement('f', PriceDate),
+                                    xmlelement('f', PriceTypeId),
+                                    xmlelement('f', WareId),
+                                    xmlelement('f', UnitId),
+                                    xmlelement('f', Price)
+                                )
+                            )
+                        from openxml(xmlelement('root', @data), '/root/CRMWarePrice')
+                            with(
+                                PriceDate STRING '@PriceDate',
+                                PriceTypeId STRING '@PriceTypeId',
+                                WareId STRING '@WareId',
+                                UnitId STRING '@UnitId',
+                                Price STRING '@Price'
+                            )
+                    )
+                ),
+                xmlelement('d',
+                    xmlattributes('CRMWareRangeLink' as "name"),
+                    (
+                        select xmlagg(
+                                xmlelement('r',
+                                    xmlelement('f', PriceTypeId),
+                                    xmlelement('f', CompanyId),
+                                    xmlelement('f', AddressId)
+                                )
+                            )
+                        from openxml(xmlelement('root', @data), '/root/PriceAddress')
+                            with(
+                                PriceTypeId STRING '@PriceTypeId',
+                                CompanyId STRING '@CompanyId',
+                                AddressId STRING '@AddressId'
+                            )
+                    )
+                )
+            )
+        );
+
     end case;
 
     return @result;

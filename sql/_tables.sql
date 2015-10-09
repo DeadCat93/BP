@@ -66,3 +66,31 @@ create table bp.CRMDespatchEx(
     unique (xid), primary key (id)
 )
 ;
+
+create index xk_bp_CRMDespatchEx_AddressId on bp.CRMDespatchEx(AddressId);
+
+create table bp.CRMWarePrice(
+
+    PriceDate datetime,
+    PriceTypeId integer,
+    WareId STRING not null,
+    UnitId STRING not null,
+
+    Price decimal(18,4),
+
+    unique(PriceDate, PriceTypeId, WareId),
+
+    id ID, xid GUID, ts TS, cts CTS,
+    unique (xid), primary key (id)
+)
+;
+
+create table bp.CRMWarePriceAddress(
+
+    PriceTypeId integer,
+    AddressId integer,
+
+    id ID, xid GUID, ts TS, cts CTS,
+    unique (xid), primary key (id)
+)
+;

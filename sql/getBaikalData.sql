@@ -1,12 +1,14 @@
 create or replace procedure bp.getBaikalData(
     @ddate datetime default today() -1,
-    @url STRING default 'http://127.0.0.1/rc_baikal/bpData'
+    @url STRING default 'http://10.25.2.16/rc_baikal9/bpData'
 )
 begin
     declare @response xml;
     declare @dateStr STRING;
+    declare @dateStrNext STRING;
 
     set @dateStr =  convert(varchar(24), @ddate, 111);
+    set @dateStrNext =  convert(varchar(24), @ddate +1, 111);
 
     -- CRMWhBalanceEx (остатки)
     set @response = bp.getData(@url + '/CRMWhBalanceEx', @dateStr);
@@ -130,6 +132,39 @@ begin
         when matched then
         update;
 
+    -- CRMWarePrice (цены)
+    set @response = bp.getData(@url + '/CRMWarePrice', @dateStrNext);
+
+    delete from bp.CRMWarePrice
+    where PriceDate = @ddate +1;
+
+    insert into bp.CRMWarePrice with auto name
+    select @ddate +1 as PriceDate,
+        PriceTypeId,
+        WareId,
+        UnitId,
+        Price
+    from openxml(xmlelement('root', @response), '/root/CRMWarePrice')
+        with(
+            PriceTypeId STRING 'PriceTypeId',
+            WareId STRING 'WareId',
+            UnitId STRING 'UnitId',
+            Price decimal(18, 2) 'Price'
+        );
+
+    -- CRMWarePrice (цены)
+    set @response = bp.getData(@url + '/CRMWarePriceAddress', @dateStrNext);
+
+    delete from bp.CRMWarePriceAddress;
+
+    insert into bp.CRMWarePriceAddress with auto name
+    select AddressId,
+        PriceTypeId
+    from openxml(xmlelement('root', @response), '/root/CRMWarePriceAddress')
+        with(
+            PriceTypeId STRING 'PriceTypeId',
+            AddressId STRING 'AddressId'
+        );
 
 
 end

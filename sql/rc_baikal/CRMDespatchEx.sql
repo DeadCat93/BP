@@ -52,7 +52,7 @@ begin
         else
             isnull(
                 (
-                    select ppl.price
+                    select top 1 ppl.price
                     from dbo.pricelist_prices ppl join bp.pricelist pl on ppl.list = pl.id
                     where ppl.ddate = r.ddate
                         and ppl.goods  = rg.goods

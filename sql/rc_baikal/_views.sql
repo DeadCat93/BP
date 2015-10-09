@@ -39,5 +39,5 @@ alter view bp.pricelist
 as
 select pl.id
 from dbo.pricelist pl
-where pl.id = 10007
+where pl.id in (10007, 11007)
 ;
