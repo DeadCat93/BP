@@ -3,12 +3,17 @@ create or replace procedure bp.xDataLinkExchangePeriod(
     @ddatee datetime default today()-1
 )
 begin
+    declare @d datetime;
 
-    while @ddateb <= @ddatee loop
+    set @d = @ddateb -1;
 
-        call bp.xDataLinkExchange(@ddateb, 0, 1, 1);
+    while @d <= @ddatee loop
+        set @d = @d + 1;
+        message 'bp.xDataLinkExchangePeriod @d = ', @d to client;
+        call bp.xDataLinkExchange(@d, 0, 1, 1);
 
-        set @ddateb = dateadd(day, 1,  @ddateb);
+
+
 
     end loop;
 

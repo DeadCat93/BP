@@ -76,7 +76,7 @@ create table bp.CRMWarePrice(
     WareId STRING not null,
     UnitId STRING not null,
 
-    Price decimal(18,4),
+    Price decimal(18,2),
 
     unique(PriceDate, PriceTypeId, WareId),
 

@@ -6,8 +6,6 @@ begin
     declare @response xml;
     declare @data xml;
 
-    set @ddate = @ddate +1;
-
     set @data = (
         xmlconcat(
             (
@@ -24,17 +22,17 @@ begin
                 select PriceDate,
                     PriceTypeId,
                     WareId,
-                    UnitId,
+                    isnull(util.getUserOption('price.UnitId'), UnitId) as UnitId ,
                     Price
                 from bp.CRMWarePrice
-                where PriceDate = @ddate
+                where PriceDate = @ddate +1
                 for xml auto
             )
         )
     );
 
 
-    set @request = bp.xDataLinkMakeRequest('CRMWarePrice', 'set', @data, @ddate);
+    set @request = bp.xDataLinkMakeRequest('CRMWarePrice', 'set', @data, @ddate +1);
     set @response = bp.[xDataLink.RequestLog](@request);
     --call xp_write_file('c:\\temp\\data.xml', @data);
     --call xp_write_file('c:\\temp\\request.xml', @request);
