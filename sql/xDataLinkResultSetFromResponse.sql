@@ -20,25 +20,33 @@ begin
         if @schemeName is not null then
             '[@name="' + @schemeName + '"]'
         endif,
-        '/f'
+        '/*'
     );
 
     insert into #schema with auto name
     select id,
         name
     from openxml(@data, @path)
-        with(name STRING '@name', id integer '@mp:id');
+        with(
+            name STRING '@name',
+            id integer '@mp:id'
+        );
 
     set @sql = (
         select string(
                 'declare local temporary table data(',
-                list(name + ' STRING' order by id),
+                list(name + if localName = 'f' then ' STRING' else ' xml' endif order by id),
                 ')'
             )
         from openxml(@data, @path)
-            with(name STRING '@name', id integer '@mp:id')
+            with(
+                name STRING '@name',
+                id integer '@mp:id',
+                localName STRING '@mp:localname'
+            )
     );
 
+    message 'bp.xDataLinkResultSetFromResponse @sql = ', @sql to client;
     execute immediate @sql;
 
     set @path = string(
@@ -46,16 +54,32 @@ begin
         if @schemeName is not null then
             '[@name="' + @schemeName + '"]'
         endif,
-        '/r/f'
+        '/r/*'
     );
 
     for execs as statements cursor for
-    select 'insert into data values(' + list('''' + replace(value, '''', '''''') + '''' order by id) + ')' as c_statement
+    select 'insert into data values(' +
+            list('''' +
+                if localName = 'f' then
+                    replace(value, '''', '''''')
+                else
+                    xmlValue
+                endif +
+                ''''
+                order by id
+            ) +
+            ')' as c_statement
     from openxml(@data, @path)
-        with(value STRING '.', id integer '@mp:id', parentId integer '../@mp:id')
+        with(
+            value STRING '.',
+            xmlValue xml '@mp:xmltext',
+            id integer '@mp:id',
+            parentId integer '../@mp:id',
+            localName STRING '@mp:localname'
+        )
     group by parentId
     do
-        --message c_statement;
+        message 'bp.xDataLinkResultSetFromResponse c_statement = ', c_statement to client;
         execute immediate c_statement;
 
     end for;
