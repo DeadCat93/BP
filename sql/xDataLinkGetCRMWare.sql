@@ -7,6 +7,7 @@ begin
     set @response = bp.[xDataLink.RequestLog](@request);
 
     set @response = bp.xDataLinkResultSetFromResponse(@response);
+    message 'bp.xDataLinkGetCRMWare @response result set end' to client;
 
     merge into bp.CRMWare(WareId, WareName, UnitId, UnitName ,Quantity)
     using with auto name(
