@@ -258,6 +258,45 @@ begin
             )
         );
 
+    when 'CRMOrderStatus' then
+
+        set @result = xmlelement('data',
+                xmlelement('s',
+                    xmlelement('d',
+                        xmlattributes('CRMOrderStatus' as "name"),
+                        bp.xDataLinkSchemeField('CRMOrderNumber', 'String'),
+                        bp.xDataLinkSchemeField('StatusId', 'String'),
+                        bp.xDataLinkSchemeField('UserName', 'String'),
+                        bp.xDataLinkSchemeField('HostName', 'String'),
+                        bp.xDataLinkSchemeField('OperationTime', 'String'),
+                        bp.xDataLinkSchemeField('Comment', 'String')
+                    )
+                ),
+                xmlelement('o',
+                    xmlelement('d',
+                        xmlattributes('CRMOrderStatus' as "name"),
+                        (
+                            select xmlagg(
+                                    xmlelement('r',
+                                        xmlelement('f', CRMOrderNumber),
+                                        xmlelement('f', StatusId),
+                                        xmlelement('f', ''),
+                                        xmlelement('f', ''),
+                                        xmlelement('f', OperationTime),
+                                        xmlelement('f', '')
+                                    )
+                                )
+                            from openxml(xmlelement('root', @data), '/root/CRMOrder')
+                                with(
+                                    CRMOrderNumber STRING '@CRMOrderNumber',
+                                    StatusId STRING '@StatusId',
+                                    OperationTime STRING '@OperationTime'
+                                )
+                        )
+                    )
+                )
+            );
+
     end case;
 
     return @result;
