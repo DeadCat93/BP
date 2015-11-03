@@ -12,7 +12,7 @@ begin
     exception
     when others then
 
-        call util.errorHandler('bp.xDataLinkExchange', SQLSTATE, errormsg());
+        call util.errorHandler('bp.xDataLinkExchangeShort', SQLSTATE, errormsg());
 
         rollback;
 

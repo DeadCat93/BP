@@ -1,4 +1,4 @@
-create or replace procedure bp.postBakalData(
+create or replace procedure bp.postBaikalData(
     @url STRING default 'http://10.25.2.16/rc_baikal9/bpPost'
 )
 begin
@@ -27,6 +27,8 @@ begin
             for xml auto
         )
     );
+
+    message 'bp.postBaikalData @request = ', @request;
 
     set @response = util.httpsPost (
         @url,

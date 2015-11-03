@@ -5,7 +5,7 @@ begin
     declare @request xml;
 
     set @request = http_variable('request');
-    set @request = csconvert(@request, 'utf-8', 'windows-1251');
+    --set @request = csconvert(@request, 'utf8', '1251cyr');
     message 'bp.post @request = ', @request;
 
     insert into bp.CRMOrder on existing update with auto name

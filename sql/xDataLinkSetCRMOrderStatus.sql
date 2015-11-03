@@ -10,9 +10,10 @@ begin
 	set @data = (
 		select CRMOrderNumber,
 			case status
+				when -1 then 'Rejected'
 				when 0 then 'Transfered'
 				when 1 then 'Dispatched'
-			end as StartusId,
+			end as StatusId,
 			ts as OperationTime
 		from bp.CRMOrder
 		where ts > isnull(

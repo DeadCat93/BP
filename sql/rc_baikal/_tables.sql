@@ -20,7 +20,8 @@ create table bp.CRMOrder(
     unique(CRMOrderNumber),
 
     status integer default 0,
-    sale_order integer,
+
+    foreign key(sale_order) references dbo.sale_order on delete set null,
 
     id ID, xid GUID, ts TS, cts CTS,
     unique (xid), primary key (id)
