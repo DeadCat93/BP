@@ -28,17 +28,13 @@ begin
         )
     );
 
-    message 'bp.postBaikalData @request = ', @request;
+    --message 'bp.postBaikalData @request = ', @request;
 
-    set @response = util.httpsPost (
-        @url,
-        'Cat:Cat',
-        'file="dummy"',
-        @request
-    );
+    set @response = bp.postDataLog(@url, @request);
 
     call util.setUserOption('bp.orderPostTs', cast(@cts as varchar(32)));
 
+    return;
 
 end
 ;

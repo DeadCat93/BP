@@ -27,6 +27,8 @@ create table bp.CRMOrder(
     unique (xid), primary key (id)
 )
 ;
+create index xk_bp_CRMOrder_ts on bp.CRMOrder(ts)
+;
 
 create table bp.CRMOrderLine(
 

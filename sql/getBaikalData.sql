@@ -11,7 +11,7 @@ begin
     set @dateStrNext =  convert(varchar(24), @ddate +1, 111);
 
     -- CRMWhBalanceEx (остатки)
-    set @response = bp.getData(@url + '/CRMWhBalanceEx', @dateStr);
+    set @response = bp.getDataLog(@url + '/CRMWhBalanceEx', @dateStr);
 
     delete from bp.CRMWhBalanceEx
     where ddate = @ddate;
@@ -54,7 +54,7 @@ begin
         Quantity = t.Quantity;
 
     -- CRMDespatchEx (движение товара)
-    set @response = bp.getData(@url + '/CRMDespatchEx', @dateStr);
+    set @response = bp.getDataLog(@url + '/CRMDespatchEx', @dateStr);
 
     delete from bp.CRMDespatchEx
     where ddate = @ddate;
@@ -133,7 +133,7 @@ begin
         update;
 
     -- CRMWarePrice (цены)
-    set @response = bp.getData(@url + '/CRMWarePrice', @dateStrNext);
+    set @response = bp.getDataLog(@url + '/CRMWarePrice', @dateStrNext);
 
     delete from bp.CRMWarePrice
     where PriceDate = @ddate +1;
@@ -153,7 +153,7 @@ begin
         );
 
     -- CRMWarePrice (цены)
-    set @response = bp.getData(@url + '/CRMWarePriceAddress', @dateStrNext);
+    set @response = bp.getDataLog(@url + '/CRMWarePriceAddress', @dateStrNext);
 
     delete from bp.CRMWarePriceAddress;
 
@@ -166,6 +166,30 @@ begin
             AddressId STRING 'AddressId'
         );
 
+    -- CRMOrderStatus
+    set @response = bp.getDataLog(@url + '/CRMOrderStatus', @dateStr);
+
+    update bp.CRMOrder
+    set status =
+            case
+                when d.status = 0 then 0
+                when d.status = 1 and d.sale_order is null then -1
+                when d.status = 1 and d.sale_order_status4 = 1 then 1
+                else 0
+            end
+    from bp.CRMOrder o join (
+            select id,
+                status,
+                sale_order,
+                sale_order_status4
+            from openxml(xmlelement('root', @response), '/root/CRMOrderStatus')
+                with(
+                    id integer 'id',
+                    status integer 'status',
+                    sale_order integer 'sale_order',
+                    sale_order_status4 integer 'sale_order_status4'
+                )
+            ) as d on d.id = o.id;
 
 end
 ;

@@ -39,7 +39,7 @@ begin
         CompanyId as AddressId,
         null as AddressRegionType,
         null as SaleChannel,
-        null as CRMOrderNumber,
+        so.ndoc as CRMOrderNumber,
         null as CRMOrderDate,
         'Despatch' as DocumentTypeId,
         r.ndoc as DocumentNumber,
@@ -65,6 +65,7 @@ begin
         coalesce(s.name, b.name) as AddressName,
         coalesce(bs.loadto, s.loadfrom, b.loadto) as Location
     from dbo.recept r join dbo.recgoods rg on r.id = rg.id
+            left outer join dbo.sale_order so on so.id = r.sorder
         join dbo.payspt pay on pay.id = rg.pays
         join dbo.buyers b on b.id = r.client
             left outer join dbo.storages s on s.id = -r.client
