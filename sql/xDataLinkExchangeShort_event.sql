@@ -7,6 +7,10 @@ every 10 minutes on  ('Mon','Tue','Wed','Thu','Fri','Sat','Sun')
 handler
 begin
 
+    if EVENT_PARAMETER('NumActive') <> '1' then
+        return;
+    end if;
+
     call bp.xDataLinkExchangeShort();
 
     exception
