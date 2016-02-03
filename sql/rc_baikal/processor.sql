@@ -12,7 +12,7 @@ begin
     set @storage = 3101;
     set @sale_dep = 1263;
     set @measure = 2078;
-    set @org = 1100;
+    set @org = 1010;
 
     set @dbnumber = (
         select dbnumber
@@ -31,6 +31,7 @@ begin
         ) as c_partner
     from bp.CRMOrder o
     where status = 0
+        and c_AddressId is not null
     do
 
         set @id = isnull(
@@ -72,7 +73,8 @@ begin
             l.Price,
             l.Quantity as volume
         from  bp.CRMOrderLine l join dbo.partner_goods pg on l.WareId = pg.code
-        where l.CRMOrder  = c_id;
+        where l.CRMOrder  = c_id
+            and l.price <> 0;
 
         update bp.CRMOrder
         set sale_order = @id,
